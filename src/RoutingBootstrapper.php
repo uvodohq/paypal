@@ -26,7 +26,7 @@ class RoutingBootstrapper
      * @param Context $context
      * @return void
      */
-    public function boot(Context $context)
+    public function boot(Context $context): void
     {
         $this->helper->addRoute(
             $context,
