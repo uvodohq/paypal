@@ -66,9 +66,41 @@ class PayPalPlugin implements PluginInterface, InstallHookInterface, UninstallHo
     }
 
     /**
+     * @throws OptionNotFoundException
+     */
+    public function install(Context $context): void
+    {
+        $this->removeOptions($context);
+    }
+
+    /**
+     * @throws OptionNotFoundException
+     */
+    public function uninstall(Context $context): void
+    {
+        $this->removeOptions($context);
+    }
+
+    /**
      * @throws OptionAlreadyExistsException
      */
     public function activate(Context $context): void
+    {
+        $this->addOptions($context);
+    }
+
+    /**
+     * @throws OptionNotFoundException
+     */
+    public function deactivate(Context $context): void
+    {
+        $this->removeOptions($context);
+    }
+
+    /**
+     * @throws OptionAlreadyExistsException
+     */
+    private function addOptions(Context $context)
     {
         $this->optionHelper->createOrUpdateOption(
             $context,
@@ -86,22 +118,6 @@ class PayPalPlugin implements PluginInterface, InstallHookInterface, UninstallHo
     /**
      * @throws OptionNotFoundException
      */
-    public function deactivate(Context $context): void
-    {
-        $this->removeOptions($context);
-    }
-
-    /**
-     * @throws OptionNotFoundException
-     */
-    public function uninstall(Context $context): void
-    {
-        $this->removeOptions($context);
-    }
-
-    /**
-     * @throws OptionNotFoundException
-     */
     private function removeOptions(Context $context)
     {
         $this->optionHelper->deleteOption(
@@ -113,10 +129,5 @@ class PayPalPlugin implements PluginInterface, InstallHookInterface, UninstallHo
             $context,
             'PAYPAL_APP_SECRET'
         );
-    }
-
-    public function install(Context $context): void
-    {
-        // TODO: Implement install() method.
     }
 }
