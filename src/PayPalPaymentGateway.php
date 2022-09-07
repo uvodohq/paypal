@@ -18,7 +18,7 @@ use Support\PaymentGateway\PaymentResponseInterface;
 use Support\PaymentGateway\SuccessResponse;
 
 /** @package Plugins\Paypal */
-class PayPalPaymentGateway implements CardPaymentGatewayInterface
+class PayPalPaymentGateway implements PaymentGatewayInterface
 {
     public const SHORT_NAME = "paypal";
     private ClientInterface $httpClient;

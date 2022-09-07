@@ -41,19 +41,22 @@ class PayPalPlugin implements PluginInterface, InstallHookInterface, UninstallHo
      */
     public function boot(Context $context): void
     {
-        $clientId = new ClientId(
-            $this->optionHelper
-                ->getOptionValue($context, 'PAYPAL_CLIENT_ID')
-        );
-
-        $appSecret = new AppSecret(
-            $this->optionHelper
-                ->getOptionValue($context, 'PAYPAL_APP_SECRET')
-        );
-
         $this->container
-            ->set(ClientId::class, $clientId)
-            ->set(AppSecret::class, $appSecret);
+            ->set(
+                ClientId::class,
+                $this->optionHelper
+                    ->getOptionValue(
+                        $context,
+                        'PAYPAL_CLIENT_ID'
+                    )
+            )->set(
+                AppSecret::class,
+                $this->optionHelper
+                    ->getOptionValue(
+                        $context,
+                        'PAYPAL_APP_SECRET'
+                    )
+            );
 
         $this->gatewayFactory
             ->registerPaymentGateway(
@@ -66,11 +69,11 @@ class PayPalPlugin implements PluginInterface, InstallHookInterface, UninstallHo
     }
 
     /**
-     * @throws OptionNotFoundException
+     * @throws OptionAlreadyExistsException
      */
     public function install(Context $context): void
     {
-        $this->removeOptions($context);
+        $this->addOptions($context);
     }
 
     /**
