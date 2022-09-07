@@ -9,16 +9,16 @@ use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
+use Support\PaymentGateway\CardPaymentGatewayInterface;
 use Support\PaymentGateway\Exceptions\InvalidRequestException;
 use Support\PaymentGateway\Exceptions\PaymentFailedExceptions;
 use Support\PaymentGateway\PaymentGatewayInterface;
 use Support\PaymentGateway\PaymentRequest;
 use Support\PaymentGateway\PaymentResponseInterface;
 use Support\PaymentGateway\SuccessResponse;
-use Support\PaymentGateway\ValueObjects\OrderId;
 
 /** @package Plugins\Paypal */
-class PayPalPaymentGateway implements PaymentGatewayInterface
+class PayPalPaymentGateway implements CardPaymentGatewayInterface
 {
     public const SHORT_NAME = "paypal";
     private ClientInterface $httpClient;

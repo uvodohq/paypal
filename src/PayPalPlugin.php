@@ -4,20 +4,22 @@ namespace Uvodo\Paypal;
 
 use Framework\Contracts\Container\ContainerInterface;
 use Modules\Option\Domain\Exceptions\OptionAlreadyExistsException;
+use Modules\Option\Domain\Exceptions\OptionNotFoundException;
 use Modules\Plugin\Domain\Context;
 use Modules\Plugin\Domain\Hooks\ActivateHookInterface;
+use Modules\Plugin\Domain\Hooks\DeactivateHookInterface;
+use Modules\Plugin\Domain\Hooks\InstallHookInterface;
+use Modules\Plugin\Domain\Hooks\UninstallHookInterface;
 use Modules\Plugin\Domain\PluginInterface;
 use Modules\Plugin\Infrastructure\Helpers\OptionHelper;
+use Modules\Setting\Domain\Exceptions\PaymentGatewayNotFoundException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Support\PaymentGateway\PaymentGatewayFactory;
 
 /** @package Uvodo\PayPal */
-class PayPalPlugin implements PluginInterface, ActivateHookInterface
+class PayPalPlugin implements PluginInterface, InstallHookInterface, UninstallHookInterface, ActivateHookInterface, DeactivateHookInterface
 {
-    private PaymentGatewayFactory $gatewayFactory;
-    private ContainerInterface $container;
-    private RoutingBootstrapper $rb;
-    private OptionHelper $optionHelper;
-
     /**
      * @param ContainerInterface $container
      * @param PaymentGatewayFactory $gatewayFactory
@@ -25,30 +27,28 @@ class PayPalPlugin implements PluginInterface, ActivateHookInterface
      * @param OptionHelper $optionHelper
      */
     public function __construct(
-        ContainerInterface $container,
-        PaymentGatewayFactory $gatewayFactory,
-        RoutingBootstrapper $rb,
-        OptionHelper $optionHelper
+        private ContainerInterface $container,
+        private PaymentGatewayFactory $gatewayFactory,
+        private RoutingBootstrapper $rb,
+        private OptionHelper $optionHelper
     ) {
-        $this->container = $container;
-        $this->gatewayFactory = $gatewayFactory;
-        $this->rb = $rb;
-        $this->optionHelper = $optionHelper;
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws PaymentGatewayNotFoundException
+     */
     public function boot(Context $context): void
     {
         $clientId = new ClientId(
             $this->optionHelper
-                ->getOption($context, 'PAYPAL_CLIENT_ID')
-                ->getValue()
-                ->getValue()
+                ->getOptionValue($context, 'PAYPAL_CLIENT_ID')
         );
 
         $appSecret = new AppSecret(
             $this->optionHelper
-                ->getOption($context, 'PAYPAL_APP_SECRET')
-                ->getValue()->getValue()
+                ->getOptionValue($context, 'PAYPAL_APP_SECRET')
         );
 
         $this->container
@@ -79,6 +79,44 @@ class PayPalPlugin implements PluginInterface, ActivateHookInterface
         $this->optionHelper->createOrUpdateOption(
             $context,
             'PAYPAL_APP_SECRET',
-            'PAYPAL_APP_SECRET');
+            'PAYPAL_APP_SECRET'
+        );
+    }
+
+    /**
+     * @throws OptionNotFoundException
+     */
+    public function deactivate(Context $context): void
+    {
+        $this->removeOptions($context);
+    }
+
+    /**
+     * @throws OptionNotFoundException
+     */
+    public function uninstall(Context $context): void
+    {
+        $this->removeOptions($context);
+    }
+
+    /**
+     * @throws OptionNotFoundException
+     */
+    private function removeOptions(Context $context)
+    {
+        $this->optionHelper->deleteOption(
+            $context,
+            'PAYPAL_CLIENT_ID'
+        );
+
+        $this->optionHelper->deleteOption(
+            $context,
+            'PAYPAL_APP_SECRET'
+        );
+    }
+
+    public function install(Context $context): void
+    {
+        // TODO: Implement install() method.
     }
 }
