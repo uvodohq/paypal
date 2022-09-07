@@ -44,18 +44,22 @@ class PayPalPlugin implements PluginInterface, InstallHookInterface, UninstallHo
         $this->container
             ->set(
                 ClientId::class,
-                $this->optionHelper
-                    ->getOptionValue(
-                        $context,
-                        'PAYPAL_CLIENT_ID'
-                    )
+                new ClientId(
+                    $this->optionHelper
+                        ->getOptionValue(
+                            $context,
+                            'PAYPAL_CLIENT_ID'
+                        )
+                )
             )->set(
                 AppSecret::class,
-                $this->optionHelper
-                    ->getOptionValue(
-                        $context,
-                        'PAYPAL_APP_SECRET'
-                    )
+                new AppSecret(
+                    $this->optionHelper
+                        ->getOptionValue(
+                            $context,
+                            'PAYPAL_APP_SECRET'
+                        )
+                )
             );
 
         $this->gatewayFactory
