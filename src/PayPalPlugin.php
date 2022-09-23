@@ -69,6 +69,8 @@ class PayPalPlugin implements PluginInterface, InstallHookInterface, UninstallHo
                 $context
             );
 
+        PayPalContext::$context = $context;
+
         $this->rb->boot($context);
     }
 
@@ -120,6 +122,12 @@ class PayPalPlugin implements PluginInterface, InstallHookInterface, UninstallHo
             'PAYPAL_APP_SECRET',
             'PAYPAL_APP_SECRET'
         );
+
+        $this->optionHelper->createOrUpdateOption(
+            $context,
+            'PAYPAL_SANDBOX_MODE',
+            '1'
+        );
     }
 
     /**
@@ -135,6 +143,11 @@ class PayPalPlugin implements PluginInterface, InstallHookInterface, UninstallHo
         $this->optionHelper->deleteOption(
             $context,
             'PAYPAL_APP_SECRET'
+        );
+
+        $this->optionHelper->deleteOption(
+            $context,
+            'PAYPAL_SANDBOX_MODE'
         );
     }
 }

@@ -9,6 +9,7 @@
 
 # Vendors
 /vendor/
+/build/
 
 # Composer generated lock file
 composer.lock

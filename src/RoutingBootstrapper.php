@@ -28,11 +28,11 @@ class RoutingBootstrapper
      */
     public function boot(Context $context): void
     {
-        $this->helper->addRoute(
+        /*$this->helper->addRoute(
             $context,
             RouteClass::PLUGINS_ADMIN_UI(),
             new Route('GET', '/test', TestRequestHandler::class)
-        );
+        );*/
 
         $this->helper->addRoute(
             $context,
@@ -60,7 +60,7 @@ class RoutingBootstrapper
 
         $this->helper->addRoute(
             $context, RouteClass::PLUGINS_ADMIN_API(),
-            new Route('PUT', '/settings', UpdateKeysRequestHandler::class)
+            new Route('POST', '/settings', UpdateKeysRequestHandler::class)
         );
     }
 }
