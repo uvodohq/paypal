@@ -60,6 +60,11 @@ class PayPalPlugin implements PluginInterface, InstallHookInterface, UninstallHo
                             'PAYPAL_APP_SECRET'
                         )
                 )
+            )->set(
+                SandboxMode::class,
+                new SandboxMode(
+                    $this->optionHelper->getOptionValue($context, 'PAYPAL_SANDBOX_MODE')
+                )
             );
 
         $this->gatewayFactory

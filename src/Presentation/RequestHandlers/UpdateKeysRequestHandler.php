@@ -29,7 +29,7 @@ class UpdateKeysRequestHandler
         $input = $this->httpService->getInput($req);
         $payPalClientId = $input->get('paypal_client_id');
         $payPalSecretKey = $input->get('paypal_app_secret');
-        $payPalSandboxMode = $input->has('paypal_sandbox_mode') ? "1" : "0";
+        $payPalSandboxMode = $input->get('paypal_sandbox_mode') ? "1" : "0";
 
         $this->optionHelper->createOrUpdateOption(
             $this->context::$context,

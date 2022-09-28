@@ -24,7 +24,7 @@ class ReadKeysRequestHandler
         return new JsonResponse([
             'paypal_client_id' => $this->optionHelper->getOptionValue($ctx::$context, 'PAYPAL_CLIENT_ID'),
             'paypal_app_secret' => $this->optionHelper->getOptionValue($ctx::$context, 'PAYPAL_APP_SECRET'),
-            'paypal_sandbox_mode' => $this->optionHelper->getOptionValue($ctx::$context, 'PAYPAL_SANDBOX_MODE')
+            'paypal_sandbox_mode' => $this->optionHelper->getOptionValue($ctx::$context, 'PAYPAL_SANDBOX_MODE') == '1'
         ]);
     }
 }

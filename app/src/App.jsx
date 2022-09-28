@@ -2,8 +2,8 @@ import {
     Box,
     Button,
     Input,
-    InputPassword,
     Stack,
+    Toggle,
     toast,
 } from "@uvodohq/planum"
 import {useEffect, useState} from "react"
@@ -118,6 +118,14 @@ function App() {
                         onChange={setPaypalSecret}
                         status={getErrorMessage("paypal_app_secret") ? "error" : "normal"}
                         errorMessage={getErrorMessage("paypal_app_secret")}
+                    />
+
+                    <Toggle
+                        labelTextOff={"Activate sandbox mode"}
+                        labelTextOn={"Deactivate sandbox mode"}
+                        aria-label="label"
+                        onChange={setSandboxMode}
+                        isSelected={paypal_sandbox_mode}
                     />
 
                     <Button

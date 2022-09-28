@@ -12,6 +12,7 @@ use Uvodo\Paypal\Presentation\RequestHandlers\TestRequestHandler;
 use Uvodo\Paypal\Presentation\RequestHandlers\UpdateKeysRequestHandler;
 use Uvodo\Paypal\Presentation\Storefront\RequestHandlers\CaptureOrderRequestHandler;
 use Uvodo\Paypal\Presentation\Storefront\RequestHandlers\CreateOrderRequestHandler;
+use Uvodo\Paypal\Presentation\Storefront\RequestHandlers\CreatePaymentRequestHandler;
 
 class RoutingBootstrapper
 {
@@ -33,6 +34,12 @@ class RoutingBootstrapper
             RouteClass::PLUGINS_ADMIN_UI(),
             new Route('GET', '/test', TestRequestHandler::class)
         );*/
+
+        $this->helper->addRoute(
+            $context,
+            RouteClass::PLUGINS_API(),
+            new Route('POST', '/orders', CreatePaymentRequestHandler::class, 'paypal.payment')
+        );
 
         $this->helper->addRoute(
             $context,
@@ -59,7 +66,8 @@ class RoutingBootstrapper
         );
 
         $this->helper->addRoute(
-            $context, RouteClass::PLUGINS_ADMIN_API(),
+            $context,
+            RouteClass::PLUGINS_ADMIN_API(),
             new Route('POST', '/settings', UpdateKeysRequestHandler::class)
         );
     }
