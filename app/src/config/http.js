@@ -2,16 +2,10 @@ import axios from 'axios'
 
 const url = new URL(window.location.href);
 
-// const token = url.searchParams.get("token");
+const token = url.searchParams.get("token");
 
-// const API_URL_PARAM = url.searchParams.get("api_url");
-// const API_URL = validURL(API_URL_PARAM) ? API_URL_PARAM : '/plugins/'
-
-const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiMSJ9.kAimCHtTlGqxJp9O-z7a069IyKAk8yT-o0rSsUOU3Wk";
-const API_URL = "http://uvodo.test/admin/api";
-
-console.log(token);
-console.log(API_URL);
+const API_URL_PARAM = url.searchParams.get("api_url");
+const API_URL = validURL(API_URL_PARAM) ? API_URL_PARAM : '/plugins/';
 
 const http = axios.create({
     baseURL: API_URL,

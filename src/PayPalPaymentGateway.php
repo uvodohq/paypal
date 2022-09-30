@@ -116,7 +116,7 @@ class PayPalPaymentGateway implements OtherPaymentGatewayInterface
     ) {
         $token = $this->createToken();
 
-        $redirectUrl = 'http://uvodo.test/checkout/' . $request->cardToken->getValue() . '?';
+        $redirectUrl = env('STOREFRONT_URL') . '/checkout/' . $request->cardToken->getValue() . '?';
 
         $returnQuery = http_build_query(
             [
