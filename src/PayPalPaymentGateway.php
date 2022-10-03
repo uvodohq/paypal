@@ -2,6 +2,8 @@
 
 namespace Uvodo\Paypal;
 
+use Brick\Money\Exception\UnknownCurrencyException;
+use Brick\Money\Money;
 use Framework\Http\StatusCodes;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
@@ -43,7 +45,8 @@ class PayPalPaymentGateway implements OtherPaymentGatewayInterface
         private AppSecret $appSecret,
         private SandboxMode $sandboxMode
     ) {
-        $this->host = $this->sandboxMode->equals(SandboxMode::ACTIVE()) ? 'api-m.sandbox.paypal.com' : 'api-m.paypal.com';
+        $this->host = $this->sandboxMode->equals(SandboxMode::ACTIVE())
+            ? 'api-m.sandbox.paypal.com' : 'api-m.paypal.com';
     }
 
     public function getShortName(): string
@@ -52,14 +55,18 @@ class PayPalPaymentGateway implements OtherPaymentGatewayInterface
     }
 
     /**
+     * @param PaymentRequest $request
+     * @return PaymentResponseInterface
      * @throws ClientExceptionInterface
+     * @throws InvalidRequestException
+     * @throws UnknownCurrencyException
      */
     public function pay(PaymentRequest $request): PaymentResponseInterface
     {
         $payment = $this->payment($request);
 
-        $payResp = new RedirectResponse();
         $redirectUrl = $payment->links ? $payment->links[1]->href : null;
+        $payResp = new RedirectResponse();
         $payResp->setAuthorization($payment->id);
         $payResp->setRedirectUrl($redirectUrl);
         return $payResp;
@@ -67,6 +74,7 @@ class PayPalPaymentGateway implements OtherPaymentGatewayInterface
 
     /**
      * @throws ClientExceptionInterface
+     * @throws InvalidRequestException
      */
     public function confirm(PaymentConfirmationRequest $request): PaymentResponseInterface
     {
@@ -85,6 +93,7 @@ class PayPalPaymentGateway implements OtherPaymentGatewayInterface
     /**
      * @return mixed
      * @throws ClientExceptionInterface
+     * @throws InvalidRequestException
      */
     private function createToken(): mixed
     {
@@ -104,12 +113,15 @@ class PayPalPaymentGateway implements OtherPaymentGatewayInterface
             )->withBody($body);
 
         $resp = $this->httpClient->sendRequest($req);
+        $this->validateResponse($resp);
         return json_decode($resp->getBody()->getContents())->access_token;
     }
 
 
     /**
      * @throws ClientExceptionInterface
+     * @throws InvalidRequestException
+     * @throws UnknownCurrencyException
      */
     private function payment(
         PaymentRequest $request
@@ -137,6 +149,8 @@ class PayPalPaymentGateway implements OtherPaymentGatewayInterface
             ->withHost($this->host)
             ->withScheme($this->scheme);
 
+        $amount = Money::ofMinor($request->amount->getValue(), $request->currencyCode->getValue());
+
         $body = $this->streamFactory->createStream(json_encode([
             "intent" => "sale",
             "payer" => [
@@ -145,7 +159,7 @@ class PayPalPaymentGateway implements OtherPaymentGatewayInterface
             "transactions" => [
                 [
                     "amount" => [
-                        "total" => $request->amount->getValue(),
+                        "total" => $amount->getAmount(),
                         "currency" => $request->currencyCode->getValue()
                     ]
                 ]
@@ -164,18 +178,19 @@ class PayPalPaymentGateway implements OtherPaymentGatewayInterface
             )->withBody($body);
 
         $resp = $this->httpClient->sendRequest($req);
+        $this->validateResponse($resp);
         return json_decode($resp->getBody()->getContents());
     }
 
 
     /**
      * @throws ClientExceptionInterface
+     * @throws InvalidRequestException
      */
     public function execute(
         string $paymentId,
         string $payerId
     ) {
-        ///v1/payments/payment/{payment_id}/execute
         $token = $this->createToken();
 
         $uri = $this->uriFactory->createUri('/' . $this->version . '/payments/payment/' . $paymentId . '/execute')
@@ -194,6 +209,7 @@ class PayPalPaymentGateway implements OtherPaymentGatewayInterface
             )->withBody($body);
 
         $resp = $this->httpClient->sendRequest($req);
+        $this->validateResponse($resp);
         return json_decode($resp->getBody()->getContents());
     }
 
@@ -204,8 +220,13 @@ class PayPalPaymentGateway implements OtherPaymentGatewayInterface
      */
     private function validateResponse(ResponseInterface $res): void
     {
-        if ($res->getStatusCode() !== StatusCodes::HTTP_OK) {
-            throw new InvalidRequestException('', $res->getStatusCode());
+        if ($res->getStatusCode() < StatusCodes::HTTP_OK
+            || $res->getStatusCode() >= StatusCodes::HTTP_MULTIPLE_CHOICES) {
+            $json = json_decode($res->getBody()->getContents());
+            $error = $json->name;
+            $description = $json->message;
+
+            throw new InvalidRequestException($description, $error);
         }
     }
 }
