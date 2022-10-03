@@ -95,12 +95,9 @@ class PayPalPlugin implements PluginInterface, InstallHookInterface, UninstallHo
         $this->removeOptions($context);
     }
 
-    /**
-     * @throws OptionAlreadyExistsException
-     */
     public function activate(Context $context): void
     {
-        $this->addOptions($context);
+        // activate
     }
 
     public function deactivate(Context $context): void
