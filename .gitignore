@@ -9,6 +9,9 @@
 
 # Vendors
 /vendor/
+
+# Build files
+*/node_modules/*
 /build/
 
 # Composer generated lock file
