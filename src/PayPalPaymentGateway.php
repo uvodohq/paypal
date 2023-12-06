@@ -67,7 +67,6 @@ class PayPalPaymentGateway implements OtherPaymentGatewayInterface
 
         $redirectUrl = $payment->links ? $payment->links[1]->href : null;
         $payResp = new RedirectResponse();
-        $payResp->setAuthorization($payment->id);
         $payResp->setRedirectUrl($redirectUrl);
         return $payResp;
     }
@@ -81,7 +80,6 @@ class PayPalPaymentGateway implements OtherPaymentGatewayInterface
         $queryParams = https_parse_query($request->queryString);
 
         $execute = $this->execute(
-            $queryParams['paymentId'],
             $queryParams['PayerID']
         );
 
@@ -132,7 +130,6 @@ class PayPalPaymentGateway implements OtherPaymentGatewayInterface
 
         $returnQuery = http_build_query(
             [
-                'gateway' => self::SHORT_NAME,
                 'redirect_type' => 'return'
             ]
         );
@@ -155,14 +152,6 @@ class PayPalPaymentGateway implements OtherPaymentGatewayInterface
             "intent" => "sale",
             "payer" => [
                 "payment_method" => "paypal"
-            ],
-            "transactions" => [
-                [
-                    "amount" => [
-                        "total" => $amount->getAmount(),
-                        "currency" => $request->currencyCode->getValue()
-                    ]
-                ]
             ],
             "redirect_urls" => [
                 "return_url" => $redirectUrl . $returnQuery,

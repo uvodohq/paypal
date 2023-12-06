@@ -49,12 +49,6 @@ class RoutingBootstrapper
 
         $this->helper->addRoute(
             $context,
-            RouteClass::PLUGINS_API(),
-            new Route('POST', '/orders/[*:orderId]/capture', CaptureOrderRequestHandler::class)
-        );
-
-        $this->helper->addRoute(
-            $context,
             RouteClass::PLUGINS_ADMIN_UI(),
             new Route('GET', '/settings/', SettingsRequestHandler::class)
         );
