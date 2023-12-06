@@ -14,6 +14,7 @@ use Uvodo\Paypal\Presentation\Storefront\RequestHandlers\CaptureOrderRequestHand
 use Uvodo\Paypal\Presentation\Storefront\RequestHandlers\CreateOrderRequestHandler;
 use Uvodo\Paypal\Presentation\Storefront\RequestHandlers\CreatePaymentRequestHandler;
 
+/** @package Uvodo\PayPal */
 class RoutingBootstrapper
 {
     private RoutingHelper $helper;
